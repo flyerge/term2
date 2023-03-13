@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 )
 
 type Term2 struct {
@@ -11,8 +12,13 @@ type Term2 struct {
 	out chan string
 }
 
-func New() *Term2 {
-	t2conn, err := net.Dial("tcp", "127.0.0.1:8080")
+func New(port string) *Term2 {
+	host := strings.Builder{}
+	host.WriteString("127.0.0.1")
+	host.WriteString(":")
+	host.WriteString(port)
+
+	t2conn, err := net.Dial("tcp", host.String())
 	if err != nil {
 		log.Fatal(err)
 	}
