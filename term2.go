@@ -1,15 +1,22 @@
 package term2
 
 import (
+	"flag"
 	"fmt"
-	"log"
 	"net"
+	"os"
 	"strings"
 )
 
 type Term2 struct {
 	w1  *net.Conn
 	out chan string
+}
+
+func usage() {
+	fmt.Fprintf(os.Stderr, "launch terminal ex: ncat -l 7070\n")
+	flag.PrintDefaults()
+	os.Exit(2)
 }
 
 func New(port string) *Term2 {
@@ -20,21 +27,35 @@ func New(port string) *Term2 {
 
 	t2conn, err := net.Dial("tcp", host.String())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		usage()
 	}
 	//defer t2conn.Close()
-	return &Term2{
+	t2 := &Term2{
 		w1:  &t2conn,
 		out: make(chan string),
 	}
+	go func() {
+		for elem := range t2.out {
+			fmt.Fprint(*t2.w1, elem)
+		}
+	}()
+	return t2
 }
 
-func (t2 *Term2) Start() {
-	for elem := range t2.out {
-		fmt.Fprint(*t2.w1, elem)
-	}
-}
-
-func (t2 *Term2) Prn(str string) {
+func (t2 *Term2) Prn(str string) *Term2 {
 	t2.out <- str
+	return t2
+}
+
+func (t2 *Term2) Prnl(str string) *Term2 {
+	str += "\n"
+	t2.Prn(str)
+	return t2
+}
+
+//Clear screen, cursor on top
+func (t2 *Term2) Cls() *Term2 {
+	t2.Prn("\033[H\033[2J")
+	return t2
 }
