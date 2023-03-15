@@ -13,12 +13,14 @@ type Term2 struct {
 	out chan string
 }
 
+// show usage
 func usage() {
 	fmt.Fprintf(os.Stderr, "launch terminal ex: ncat -l 7070\n")
 	flag.PrintDefaults()
 	os.Exit(2)
 }
 
+// create & launch routine
 func New(port string) *Term2 {
 	host := strings.Builder{}
 	host.WriteString("127.0.0.1")
@@ -55,6 +57,9 @@ func (t2 *Term2) Prnl(str string) *Term2 {
 }
 
 func (t2 *Term2) Cls() *Term2 {
+	// \033[G moves cursor to beginning of the line
+	// \033[2K clear entire line
+	// https://en.wikipedia.org/wiki/ANSI_escape_code
 	clscmd := "\033[G\033[2K"
 	t2.Prn(clscmd)
 	return t2
