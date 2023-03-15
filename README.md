@@ -44,4 +44,3 @@ func goroutine(msg string, t2 term2.Term2) {
 
 ![tterm2](tterm2.gif)
 
-> https://en.wikipedia.org/wiki/ANSI_escape_code
